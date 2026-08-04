@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="km">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>កម្មវិធីបង្កើតបណ្ណសរសើរ - Khmer Certificate Generator</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📜</text></svg>">
+    <!-- Google Fonts for Khmer Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Battambang:wght@400;700&family=Kantumruy+Pro:wght@400;500;600;700&family=Moul&family=Moulpali&family=Siemreap&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome for UI Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- html2canvas and html2pdf for high quality image/pdf export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-kantumruy">
+
+    <!-- App Header Navbar -->
+    <header
+        class="no-print bg-slate-900 border-b border-slate-800 sticky top-0 z-50 px-4 py-3 shadow-md flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div
+                class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-red-600 flex items-center justify-center shadow-lg text-white font-bold text-xl">
+                📜
+            </div>
+            <div>
+                <h1 class="text-lg font-bold text-white leading-tight font-moul">កម្មវិធីបង្កើតបណ្ណសរសើរ</h1>
+                <p class="text-xs text-slate-400">Khmer School Certificate of Commendation Generator</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <input type="file" id="input-template-file" accept=".json" class="hidden">
+            <button id="btn-import-template"
+                class="px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-teal-300 rounded-lg transition-all flex items-center gap-1.5 border border-teal-800/60"
+                title="នាំចូលគំរូពីឯកសារ .json">
+                <i class="fa-solid fa-file-import"></i>
+                <span>នាំចូលគំរូ</span>
+            </button>
+            <button id="btn-export-template"
+                class="px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-lg transition-all flex items-center gap-1.5 border border-amber-800/60"
+                title="ទាញយក និងរក្សាទុកគំរូជាឯកសារ .json">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>ទាញយកគំរូ</span>
+            </button>
+
+            <button id="btn-google-sheets"
+                class="px-3 py-1.5 text-xs bg-emerald-800/90 hover:bg-emerald-700 text-emerald-200 rounded-lg transition-all flex items-center gap-1.5 border border-emerald-600/60 shadow-sm"
+                title="ភ្ជាប់ និងសមកាលកម្មទិន្នន័យជាមួយ Google Sheets">
+                <i class="fa-solid fa-file-excel text-emerald-400"></i>
+                <span>Google Sheets</span>
+            </button>
+
+            <div class="h-4 w-px bg-slate-700 my-auto"></div>
+            <button id="btn-sample-data"
+                class="px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg transition-all flex items-center gap-1.5 border border-slate-700">
+                <i class="fa-solid fa-rotate-right"></i>
+                <span>ទិន្នន័យគំរូ</span>
+            </button>
+
+            <button id="btn-export-png"
+                class="px-3 py-1.5 text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-lg shadow-sm transition-all flex items-center gap-1.5"
+                title="ទាញយកបណ្ណបច្ចុប្បន្នជា PNG">
+                <i class="fa-solid fa-image"></i>
+                <span>PNG</span>
+            </button>
+
+            <button id="btn-export-pdf"
+                class="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-lg shadow-sm transition-all flex items-center gap-1.5"
+                title="ទាញយកបណ្ណបច្ចុប្បន្នជា PDF">
+                <i class="fa-solid fa-file-pdf"></i>
+                <span>PDF បណ្ណនេះ</span>
+            </button>
+
+            <button id="btn-export-word"
+                class="px-3 py-1.5 text-xs bg-sky-600 hover:bg-sky-500 text-white font-medium rounded-lg shadow-sm transition-all flex items-center gap-1.5"
+                title="ទាញយកបណ្ណបច្ចុប្បន្នជា Microsoft Word (.doc) សម្រាប់កែសម្រួល">
+                <i class="fa-solid fa-file-word"></i>
+                <span>Word បណ្ណនេះ</span>
+            </button>
+
+            <button id="btn-export-bulk-pdf"
+                class="px-3 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-lg shadow-sm transition-all flex items-center gap-1.5"
+                title="ទាញយកបណ្ណសិស្សទាំងអស់ជា PDF មួយ">
+                <i class="fa-solid fa-files"></i>
+                <span>PDF ទាំងអស់ (<span id="count-badge-pdf">៥</span>)</span>
+            </button>
+
+            <button id="btn-export-bulk-word"
+                class="px-3 py-1.5 text-xs bg-teal-600 hover:bg-teal-500 text-white font-medium rounded-lg shadow-sm transition-all flex items-center gap-1.5"
+                title="ទាញយកបណ្ណសិស្សទាំងអស់ជា Microsoft Word (.doc)">
+                <i class="fa-solid fa-file-word"></i>
+                <span>Word ទាំងអស់ (<span id="count-badge-word">៥</span>)</span>
+            </button>
+
+            <button id="btn-print-all"
+                class="px-3.5 py-1.5 text-xs bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg shadow-md transition-all flex items-center gap-1.5"
+                title="បោះពុម្ពបណ្ណសិស្សទាំងអស់ក្នុងពេលតែមួយ">
+                <i class="fa-solid fa-print text-sm"></i>
+                <span>បោះពុម្ពទាំងអស់ (<span id="count-badge-print">៥</span>)</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="app-container flex-1 flex flex-col lg:flex-row overflow-hidden">
+
+        <!-- Left Sidebar: Controls & Inputs -->
+        <aside
+            class="no-print w-full lg:w-[420px] xl:w-[460px] bg-slate-900 border-r border-slate-800 flex flex-col h-auto lg:h-[calc(100vh-61px)] shadow-xl z-20">
+
+            <!-- Navigation Tabs -->
+            <div class="flex border-b border-slate-800 bg-slate-950/60 p-1 gap-1">
+                <button id="tab-btn-single"
+                    class="tab-btn active flex-1 py-2 px-3 text-xs font-semibold rounded-md transition-all text-amber-400 bg-slate-800 flex items-center justify-center gap-1.5"
+                    data-tab="tab-single">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <span>បណ្ណទោល (Single)</span>
+                </button>
+                <button id="tab-btn-batch"
+                    class="tab-btn flex-1 py-2 px-3 text-xs font-semibold rounded-md transition-all text-slate-400 hover:text-slate-200 flex items-center justify-center gap-1.5"
+                    data-tab="tab-batch">
+                    <i class="fa-solid fa-users-rectangle"></i>
+                    <span>បង្កើតជាច្រើន (Batch)</span>
+                </button>
+                <button id="tab-btn-style"
+                    class="tab-btn flex-1 py-2 px-3 text-xs font-semibold rounded-md transition-all text-slate-400 hover:text-slate-200 flex items-center justify-center gap-1.5"
+                    data-tab="tab-style">
+                    <i class="fa-solid fa-palette"></i>
+                    <span>រចនាបថ (Style)</span>
+                </button>
+            </div>
+
+            <!-- Tab Contents Container -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-5 custom-scrollbar">
+
+                <!-- TAB 1: SINGLE CERTIFICATE FORM -->
+                <div id="tab-single" class="tab-content space-y-4">
+
+                    <!-- Template Manager Card -->
+                    <div class="form-section bg-slate-800/60 p-3.5 rounded-xl border border-slate-700/60 space-y-2.5">
+                        <div class="flex items-center justify-between border-b border-slate-700/60 pb-2">
+                            <h3 class="text-xs font-bold text-teal-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="fa-solid fa-folder-open"></i> គ្រប់គ្រងគំរូ (Template Manager)
+                            </h3>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 pt-1">
+                            <button type="button" id="btn-save-local-template" class="py-2 px-2.5 bg-slate-900 hover:bg-slate-800 text-teal-300 rounded-lg text-xs font-medium border border-teal-800/50 flex items-center justify-center gap-1.5 transition" title="រក្សាទុកទិន្នន័យ និងរចនាបថបច្ចុប្បន្នទុកក្នុង Browser">
+                                <i class="fa-solid fa-bookmark"></i>
+                                <span>រក្សាទុកក្នុង Browser</span>
+                            </button>
+                            <button type="button" id="btn-load-local-template" class="py-2 px-2.5 bg-slate-900 hover:bg-slate-800 text-amber-300 rounded-lg text-xs font-medium border border-amber-800/50 flex items-center justify-center gap-1.5 transition" title="ផ្ទុកគំរូដែលបានរក្សាទុកក្នុង Browser">
+                                <i class="fa-solid fa-box-archive"></i>
+                                <span>ផ្ទុកគំរូក្នុង Browser</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Toggle Options -->
+                    <div
+                        class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60 flex items-center justify-between">
+                        <label for="input-auto-khmer-num"
+                            class="text-xs font-medium text-slate-200 flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="input-auto-khmer-num" checked
+                                class="w-4 h-4 accent-amber-500 rounded cursor-pointer">
+                            <span>បំប្លែងលេខអង់គ្លេសទៅលេខខ្មែរស្វ័យប្រវត្តិ (123 ➔ ១២៣)</span>
+                        </label>
+                    </div>
+
+                    <!-- 1. Header Information -->
+                    <div class="form-section bg-slate-800/40 p-3.5 rounded-xl border border-slate-700/50 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-700/60 pb-2">
+                            <h3
+                                class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="fa-solid fa-building-columns"></i> ព័ត៌មានស្ថាប័ន / សាលារៀន
+                            </h3>
+                        </div>
+
+                        <div class="space-y-2.5">
+                            <div>
+                                <label class="text-[11px] text-slate-300 block mb-1">ក្រសួង (Ministry)</label>
+                                <input type="text" id="input-ministry" value="ក្រសួងអប់រំ យុវជន និងកីឡា"
+                                    class="form-input">
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="text-[11px] text-slate-300 block mb-1">ការិយាល័យអប់រំ
+                                        (Office/District)</label>
+                                    <input type="text" id="input-office" value="ការិ.អយក នៃរដ្ឋបាលស្រុកជលគិរី"
+                                        class="form-input">
+                                </div>
+                                <div>
+                                    <label class="text-[11px] text-slate-300 block mb-1">ឈ្មោះសាលា (School Name)</label>
+                                    <input type="text" id="input-school" value="វិទ្យាល័យ ព្រះនរោត្តម សីហមុនី"
+                                        class="form-input">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="text-[11px] text-slate-300 block mb-1">តួនាទីអ្នកជូនបណ្ណ (Awarding
+                                    Title)</label>
+                                <input type="text" id="input-principal-title" value="នាយកវិទ្យាល័យ ព្រះនរោត្តម សីហមុនី"
+                                    class="form-input font-medium text-amber-300">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Student Details -->
+                    <div class="form-section bg-slate-800/40 p-3.5 rounded-xl border border-slate-700/50 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-700/60 pb-2">
+                            <h3
+                                class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="fa-solid fa-user-graduate"></i> ព័ត៌មានសិស្ស
+                            </h3>
+                        </div>
+
+                        <div class="space-y-2.5">
+                            <div class="grid grid-cols-3 gap-2">
+                                <div class="col-span-2">
+                                    <label class="text-[11px] text-slate-300 block mb-1">ឈ្មោះសិស្ស (Student
+                                        Name)</label>
+                                    <input type="text" id="input-student-name" value="សស់ សៀងហេង"
+                                        class="form-input font-bold text-blue-300">
+                                </div>
+                                <div>
+                                    <label class="text-[11px] text-slate-300 block mb-1">ភេទ (Gender)</label>
+                                    <select id="input-gender" class="form-input">
+                                        <option value="ប្រុស" selected>ប្រុស</option>
+                                        <option value="ស្រី">ស្រី</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Date of birth -->
+                            <div>
+                                <label class="text-[11px] text-slate-300 block mb-1">ថ្ងៃ ខែ ឆ្នាំ កើត (Date of
+                                    Birth)</label>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <input type="text" id="input-dob-day" value="២៤" placeholder="ថ្ងៃទី"
+                                        class="form-input text-center">
+                                    <input type="text" id="input-dob-month" value="មេសា" placeholder="ខែ"
+                                        class="form-input text-center">
+                                    <input type="text" id="input-dob-year" value="២០១៤" placeholder="ឆ្នាំ"
+                                        class="form-input text-center">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="text-[11px] text-slate-300 block mb-1">រៀនថ្នាក់ទី (Grade /
+                                        Class)</label>
+                                    <input type="text" id="input-grade" value="៧&quot;C&quot;" class="form-input">
+                                </div>
+                                <div>
+                                    <label class="text-[11px] text-slate-300 block mb-1">ចំណាត់ថ្នាក់លេខ (Rank)</label>
+                                    <input type="text" id="input-rank" value="៥"
+                                        class="form-input text-center font-bold text-red-400">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="text-[11px] text-slate-300 block mb-1">សម័យកាល (Period)</label>
+                                    <input type="text" id="input-period" value="ប្រចាំខែឧសភា" class="form-input">
+                                </div>
+                                <div>
+                                    <label class="text-[11px] text-slate-300 block mb-1">ឆ្នាំសិក្សា (Academic
+                                        Year)</label>
+                                    <input type="text" id="input-academic-year" value="២០២៥-២០២៦" class="form-input">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Dates & Signatures -->
+                    <div class="form-section bg-slate-800/40 p-3.5 rounded-xl border border-slate-700/50 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-700/60 pb-2">
+                            <h3
+                                class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="fa-solid fa-file-signature"></i> កាលបរិច្ឆេទ និងហត្ថលេខា
+                            </h3>
+                        </div>
+
+                        <div class="space-y-2.5">
+                            <div>
+                                <label class="text-[11px] text-slate-300 block mb-1">កាលបរិច្ឆេទចន្ទគតិ (Lunar
+                                    Date)</label>
+                                <input type="text" id="input-lunar-date"
+                                    value="ថ្ងៃចន្ទ ៥កើត ខែជេស្ឋ ឆ្នាំថោះ បញ្ចស័ក ព.ស. ២៥៧០" class="form-input">
+                            </div>
+
+                            <div>
+                                <label class="text-[11px] text-slate-300 block mb-1">ទីកន្លែង និងកាលបរិច្ឆេទសុរិយគតិ
+                                    (Solar Date & Place)</label>
+                                <input type="text" id="input-solar-date"
+                                    value="វិ.ព្រះនរោត្តមសីហមុនី ថ្ងៃទី២៥ ខែឧសភា ឆ្នាំ២០២៦" class="form-input">
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="text-[11px] text-slate-300 block mb-1">ឈ្មោះនាយក (Principal
+                                        Name)</label>
+                                    <input type="text" id="input-principal-name" value="" class="form-input">
+                                </div>
+                                <div>
+                                    <label class="text-[11px] text-slate-300 block mb-1">ឈ្មោះគ្រូបន្ទុកថ្នាក់ (Teacher
+                                        Name)</label>
+                                    <input type="text" id="input-teacher-name" value="វី ធីរ៉ូ" class="form-input">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Photo & Logo Uploads -->
+                    <div class="form-section bg-slate-800/40 p-3.5 rounded-xl border border-slate-700/50 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-700/60 pb-2">
+                            <h3
+                                class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="fa-solid fa-image"></i> រូបថត / ត្រាសាលា / ឡូហ្គោ
+                            </h3>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[11px] text-slate-300 block mb-1">រូបថតសិស្ស/ត្រា (Photo Box)</label>
+                                <input type="file" id="input-photo-file" accept="image/*" class="hidden">
+                                <div class="flex gap-1">
+                                    <button type="button" onclick="document.getElementById('input-photo-file').click()"
+                                        class="flex-1 py-1.5 px-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded text-xs transition">
+                                        <i class="fa-solid fa-upload"></i> ជ្រើសរើសរូប
+                                    </button>
+                                    <button type="button" id="btn-remove-photo"
+                                        class="py-1.5 px-2 bg-rose-900/60 hover:bg-rose-800 text-rose-200 rounded text-xs transition">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="text-[11px] text-slate-300 block mb-1">ឡូហ្គោសាលា (School Logo)</label>
+                                <input type="file" id="input-logo-file" accept="image/*" class="hidden">
+                                <div class="flex gap-1">
+                                    <button type="button" onclick="document.getElementById('input-logo-file').click()"
+                                        class="flex-1 py-1.5 px-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded text-xs transition">
+                                        <i class="fa-solid fa-upload"></i> ជ្រើសរើស
+                                    </button>
+                                    <button type="button" id="btn-reset-logo"
+                                        class="py-1.5 px-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded text-xs transition"
+                                        title="ប្រើ Logo ក្រសួងដើម">
+                                        <i class="fa-solid fa-rotate-left"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-1 flex items-center justify-between">
+                            <label class="text-xs text-slate-300 flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="toggle-photo-box" checked
+                                    class="w-4 h-4 accent-amber-500 rounded">
+                                <span>បង្ហាញប្រអប់រូបថត/ត្រានៅចំកណ្តាលខាងក្រោម</span>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- TAB 2: BATCH / MULTIPLE CERTIFICATES -->
+                <div id="tab-batch" class="tab-content space-y-4 hidden">
+                    <div
+                        class="bg-amber-950/30 border border-amber-800/40 p-3 rounded-xl text-xs text-amber-200 space-y-1">
+                        <div class="font-bold flex items-center gap-1.5 text-amber-400">
+                            <i class="fa-solid fa-lightbulb"></i> ការបង្កើតបណ្ណជាច្រើន (Batch Generation)
+                        </div>
+                        <p>បញ្ចូលបញ្ជីឈ្មោះសិស្ស ដើម្បីបង្កើតបណ្ណសរសើរសម្រាប់សិស្សច្រើននាក់ក្នុងពេលតែមួយ។</p>
+                    </div>
+
+                    <div class="flex items-center justify-between gap-2 flex-wrap">
+                        <div class="flex gap-1.5">
+                            <button id="btn-add-batch-row"
+                                class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-lg transition flex items-center gap-1">
+                                <i class="fa-solid fa-plus"></i> បន្ថែមសិស្ស
+                            </button>
+
+                            <button id="btn-load-demo-batch"
+                                class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg transition border border-slate-700 flex items-center gap-1">
+                                <i class="fa-solid fa-list-check"></i> បញ្ចូលថ្នាក់គំរូ (៥នាក់)
+                            </button>
+                        </div>
+
+                        <div class="flex gap-1.5">
+                            <button id="btn-quick-gsheet-save"
+                                class="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-medium rounded-lg transition flex items-center gap-1 shadow-sm"
+                                title="រក្សាទុកទិន្នន័យសិស្សទៅ Google Sheet">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> រក្សាទុកទៅ Sheet
+                            </button>
+                            <button id="btn-quick-gsheet-load"
+                                class="px-2.5 py-1.5 bg-teal-800 hover:bg-teal-700 text-teal-200 text-xs rounded-lg transition border border-teal-700 flex items-center gap-1 shadow-sm"
+                                title="ទាញយកបញ្ជីសិស្សពី Google Sheet">
+                                <i class="fa-solid fa-cloud-arrow-down"></i> ទាញយកពី Sheet
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Batch Student List Table -->
+                    <div
+                        class="overflow-x-auto max-h-[420px] border border-slate-700/60 rounded-xl bg-slate-950/60 custom-scrollbar">
+                        <table class="w-full text-left text-xs text-slate-200 border-collapse">
+                            <thead
+                                class="bg-slate-800 text-slate-300 uppercase text-[10px] sticky top-0 z-10 shadow-sm">
+                                <tr>
+                                    <th class="p-2 text-center w-8">#</th>
+                                    <th class="p-2 min-w-[110px]">ឈ្មោះសិស្ស</th>
+                                    <th class="p-2 w-16">ភេទ</th>
+                                    <th class="p-2 min-w-[130px]">កើតថ្ងៃទី/ខែ/ឆ្នាំ</th>
+                                    <th class="p-2 w-16">ថ្នាក់</th>
+                                    <th class="p-2 w-14 text-center">លេខ</th>
+                                    <th class="p-2 text-center w-16">សកម្មភាព</th>
+                                </tr>
+                            </thead>
+                            <tbody id="batch-table-body" class="divide-y divide-slate-800/60">
+                                <!-- Dynamic Inline Editable Batch Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Batch Pagination & Controls -->
+                    <div
+                        class="bg-slate-800/50 p-3 rounded-xl border border-slate-700/60 flex items-center justify-between">
+                        <div class="text-xs text-slate-300">
+                            កំពុងបង្ហាញបណ្ណទី <span id="batch-current-index" class="font-bold text-amber-400">1</span>
+                            នៃ <span id="batch-total-count" class="font-bold text-amber-400">1</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button id="btn-batch-prev"
+                                class="p-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded text-xs transition">
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </button>
+                            <button id="btn-batch-next"
+                                class="p-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded text-xs transition">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: STYLING & CUSTOMIZATION -->
+                <div id="tab-style" class="tab-content space-y-4 hidden">
+
+                    <!-- Frame Selection Section -->
+                    <div class="form-section bg-slate-800/40 p-3.5 rounded-xl border border-slate-700/50 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-700/60 pb-2">
+                            <h3
+                                class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="fa-solid fa-border-top-left"></i> ជ្រើសរើសម៉ូដស៊ុម (Frame Styles)
+                            </h3>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-[11px] text-slate-300 block mb-1.5">គំរូស៊ុមដែលមានស្រាប់ (Preset
+                                    Frame Options)</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button type="button"
+                                        class="frame-preset-btn active p-2 rounded-lg border-2 border-amber-400 bg-slate-800 text-left transition flex items-center gap-2"
+                                        data-frame="frame-kbach">
+                                        <div
+                                            class="w-8 h-8 rounded border border-blue-500 bg-blue-950/80 flex items-center justify-center text-blue-400 text-xs font-bold">
+                                            🏛️
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-bold text-white leading-tight">ក្បាច់ខ្មែរបុរាណ
+                                            </div>
+                                            <div class="text-[10px] text-slate-400">Classic Khmer</div>
+                                        </div>
+                                    </button>
+
+                                    <button type="button"
+                                        class="frame-preset-btn p-2 rounded-lg border-2 border-slate-700 bg-slate-800 text-left transition flex items-center gap-2"
+                                        data-frame="frame-gold">
+                                        <div
+                                            class="w-8 h-8 rounded border border-amber-500 bg-amber-950/80 flex items-center justify-center text-amber-400 text-xs font-bold">
+                                            👑
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-bold text-white leading-tight">ស៊ុមមាសរាជវាំង</div>
+                                            <div class="text-[10px] text-slate-400">Royal Gold</div>
+                                        </div>
+                                    </button>
+
+                                    <button type="button"
+                                        class="frame-preset-btn p-2 rounded-lg border-2 border-slate-700 bg-slate-800 text-left transition flex items-center gap-2"
+                                        data-frame="frame-executive">
+                                        <div
+                                            class="w-8 h-8 rounded border border-slate-400 bg-slate-900 flex items-center justify-center text-slate-300 text-xs font-bold">
+                                            📜
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-bold text-white leading-tight">បន្ទាត់ផ្លូវការ
+                                            </div>
+                                            <div class="text-[10px] text-slate-400">Executive Double</div>
+                                        </div>
+                                    </button>
+
+                                    <button type="button"
+                                        class="frame-preset-btn p-2 rounded-lg border-2 border-slate-700 bg-slate-800 text-left transition flex items-center gap-2"
+                                        data-frame="frame-floral">
+                                        <div
+                                            class="w-8 h-8 rounded border border-emerald-500 bg-emerald-950/80 flex items-center justify-center text-emerald-400 text-xs font-bold">
+                                            🌸
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-bold text-white leading-tight">ផ្កាក្បាច់ខ្មែរ
+                                            </div>
+                                            <div class="text-[10px] text-slate-400">Floral Vignette</div>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Custom Frame Image Upload -->
+                            <div class="pt-2 border-t border-slate-700/60">
+                                <label class="text-[11px] text-slate-300 block mb-1">បញ្ចូលរូបស៊ុមផ្ទាល់ខ្លួន (Upload
+                                    Custom Frame PNG/SVG)</label>
+                                <input type="file" id="input-frame-file" accept="image/*" class="hidden">
+                                <div class="flex gap-2">
+                                    <button type="button" onclick="document.getElementById('input-frame-file').click()"
+                                        class="flex-1 py-1.5 px-3 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg text-xs transition flex items-center justify-center gap-1.5">
+                                        <i class="fa-solid fa-file-image"></i>
+                                        <span>ជ្រើសរើសរូបស៊ុម</span>
+                                    </button>
+                                    <button type="button" id="btn-remove-custom-frame"
+                                        class="py-1.5 px-3 bg-rose-900/60 hover:bg-rose-800 text-rose-200 rounded-lg text-xs transition hidden">
+                                        <i class="fa-solid fa-trash"></i> លុបស៊ុម
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section bg-slate-800/40 p-3.5 rounded-xl border border-slate-700/50 space-y-3">
+                        <h3
+                            class="text-xs font-bold text-amber-400 uppercase tracking-wider border-b border-slate-700/60 pb-2">
+                            <i class="fa-solid fa-palette"></i> ពណ៌ និងរចនាបថស៊ុម (Border & Theme)
+                        </h3>
+
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-[11px] text-slate-300 block mb-1.5">ពណ៌ស៊ុម និងអក្សរស៊ុម (Border
+                                    Color Theme)</label>
+                                <div class="grid grid-cols-4 gap-2">
+                                    <button
+                                        class="theme-preset-btn active py-2 rounded-lg border-2 border-amber-400 bg-blue-900 text-white text-xs font-bold flex flex-col items-center gap-1"
+                                        data-color="#153285">
+                                        <span class="w-4 h-4 rounded-full bg-[#153285] border border-white"></span>
+                                        <span>ខៀវ (Blue)</span>
+                                    </button>
+                                    <button
+                                        class="theme-preset-btn py-2 rounded-lg border-2 border-slate-700 bg-amber-950 text-amber-200 text-xs font-bold flex flex-col items-center gap-1"
+                                        data-color="#b45309">
+                                        <span class="w-4 h-4 rounded-full bg-[#b45309] border border-white"></span>
+                                        <span>មាស (Gold)</span>
+                                    </button>
+                                    <button
+                                        class="theme-preset-btn py-2 rounded-lg border-2 border-slate-700 bg-red-950 text-red-200 text-xs font-bold flex flex-col items-center gap-1"
+                                        data-color="#991b1b">
+                                        <span class="w-4 h-4 rounded-full bg-[#991b1b] border border-white"></span>
+                                        <span>ក្រហម (Red)</span>
+                                    </button>
+                                    <button
+                                        class="theme-preset-btn py-2 rounded-lg border-2 border-slate-700 bg-emerald-950 text-emerald-200 text-xs font-bold flex flex-col items-center gap-1"
+                                        data-color="#065f46">
+                                        <span class="w-4 h-4 rounded-full bg-[#065f46] border border-white"></span>
+                                        <span>បៃតង (Green)</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="text-[11px] text-slate-300 block mb-1">ពណ៌ចំណងជើង "បណ្ណសរសើរ"</label>
+                                <input type="color" id="input-title-color" value="#e53e3e"
+                                    class="w-full h-8 bg-slate-800 rounded border border-slate-700 cursor-pointer">
+                            </div>
+
+                            <div>
+                                <label class="text-[11px] text-slate-300 block mb-1">ពណ៌តួនាទី
+                                    "នាយកវិទ្យាល័យ..."</label>
+                                <input type="color" id="input-accent-color" value="#d97706"
+                                    class="w-full h-8 bg-slate-800 rounded border border-slate-700 cursor-pointer">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section bg-slate-800/40 p-3.5 rounded-xl border border-slate-700/50 space-y-3">
+                        <h3
+                            class="text-xs font-bold text-amber-400 uppercase tracking-wider border-b border-slate-700/60 pb-2">
+                            <i class="fa-solid fa-font"></i> ទំហំ និងពុម្ពអក្សរ (Font Adjustments)
+                        </h3>
+
+                        <div class="space-y-3">
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <label class="text-[11px] text-slate-300">ទំហំអត្ថបទសំខាន់ (Main Text Size)</label>
+                                    <span id="font-size-val" class="text-xs text-amber-400 font-bold">18.5px</span>
+                                </div>
+                                <input type="range" id="input-font-size" min="14" max="24" step="0.5" value="18.5"
+                                    class="w-full accent-amber-500">
+                            </div>
+
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <label class="text-[11px] text-slate-300">ទំហំចំណងជើង "បណ្ណសរសើរ"</label>
+                                    <span id="title-size-val" class="text-xs text-amber-400 font-bold">44px</span>
+                                </div>
+                                <input type="range" id="input-title-size" min="32" max="56" step="1" value="44"
+                                    class="w-full accent-amber-500">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- Right Workspace: Certificate Canvas Preview -->
+        <main class="flex-1 bg-slate-950 p-4 lg:p-8 overflow-auto flex items-center justify-center relative">
+
+            <!-- Zoom / Scaler Controls -->
+            <div
+                class="no-print absolute top-4 right-4 z-30 bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-xl p-1.5 flex items-center gap-2 shadow-lg">
+                <button id="btn-reset-positions"
+                    class="px-2.5 py-1 rounded-lg bg-amber-950/80 hover:bg-amber-900 text-amber-300 text-xs transition border border-amber-800/60 flex items-center gap-1"
+                    title="កំណត់ទីតាំងអត្ថបទទាំងអស់មកទីតាំងដើមវិញ">
+                    <i class="fa-solid fa-arrows-to-dot"></i>
+                    <span>កំណត់ទីតាំងដើម</span>
+                </button>
+                <div class="h-4 w-px bg-slate-700"></div>
+                <button id="btn-zoom-out"
+                    class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 flex items-center justify-center transition">
+                    <i class="fa-solid fa-minus text-xs"></i>
+                </button>
+                <span id="zoom-level" class="text-xs font-bold text-amber-400 w-12 text-center">100%</span>
+                <button id="btn-zoom-in"
+                    class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 flex items-center justify-center transition">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                </button>
+                <button id="btn-zoom-reset"
+                    class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs transition">
+                    Reset Zoom
+                </button>
+            </div>
+
+            <!-- Outer Printable Certificate Container Wrapper -->
+            <div id="certificate-wrapper"
+                class="transition-transform transform duration-150 origin-top flex items-center justify-center">
+
+                <!-- CERTIFICATE CANVAS (A4 Landscape Standard Aspect Ratio: ~1.414 -> 1050px x 742px) -->
+                <div id="certificate-canvas"
+                    class="certificate-paper relative bg-white text-slate-900 shadow-2xl overflow-hidden select-none">
+
+                    <!-- SVG Ornate Frame Border Background Layer -->
+                    <div id="cert-frame-container" class="absolute inset-0 pointer-events-none z-0 p-3">
+                        <img id="cert-custom-frame-img" src="" alt="Custom Frame"
+                            class="hidden w-full h-full object-fill pointer-events-none">
+                        <svg id="cert-frame-svg" class="w-full h-full text-[#153285] border-svg-theme"
+                            viewBox="0 0 1050 742" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Outer Ornate Pattern Border Frame -->
+                            <rect x="6" y="6" width="1038" height="730" rx="4" stroke="currentColor" stroke-width="4"
+                                fill="none" />
+                            <rect x="14" y="14" width="1022" height="714" rx="2" stroke="currentColor"
+                                stroke-width="1.5" fill="none" />
+                            <rect x="18" y="18" width="1014" height="706" rx="2" stroke="currentColor" stroke-width="3"
+                                fill="none" />
+                            <rect x="26" y="26" width="998" height="690" rx="1" stroke="currentColor" stroke-width="1.5"
+                                stroke-dasharray="4 2" fill="none" />
+                            <rect x="30" y="30" width="990" height="682" rx="1" stroke="currentColor" stroke-width="2.5"
+                                fill="none" />
+
+                            <!-- Traditional Kbach Corner Ornaments -->
+                            <!-- Top Left Corner -->
+                            <g transform="translate(30, 30)">
+                                <path d="M0,0 L60,0 C40,10 30,25 30,50 C25,30 10,40 0,60 Z" fill="currentColor" />
+                                <circle cx="18" cy="18" r="6" fill="currentColor" />
+                                <path d="M4,4 L45,4 C30,12 22,22 22,45 C18,25 12,28 4,45 Z" fill="white"
+                                    opacity="0.4" />
+                            </g>
+                            <!-- Top Right Corner -->
+                            <g transform="translate(1020, 30) scale(-1, 1)">
+                                <path d="M0,0 L60,0 C40,10 30,25 30,50 C25,30 10,40 0,60 Z" fill="currentColor" />
+                                <circle cx="18" cy="18" r="6" fill="currentColor" />
+                                <path d="M4,4 L45,4 C30,12 22,22 22,45 C18,25 12,28 4,45 Z" fill="white"
+                                    opacity="0.4" />
+                            </g>
+                            <!-- Bottom Left Corner -->
+                            <g transform="translate(30, 712) scale(1, -1)">
+                                <path d="M0,0 L60,0 C40,10 30,25 30,50 C25,30 10,40 0,60 Z" fill="currentColor" />
+                                <circle cx="18" cy="18" r="6" fill="currentColor" />
+                                <path d="M4,4 L45,4 C30,12 22,22 22,45 C18,25 12,28 4,45 Z" fill="white"
+                                    opacity="0.4" />
+                            </g>
+                            <!-- Bottom Right Corner -->
+                            <g transform="translate(1020, 712) scale(-1, -1)">
+                                <path d="M0,0 L60,0 C40,10 30,25 30,50 C25,30 10,40 0,60 Z" fill="currentColor" />
+                                <circle cx="18" cy="18" r="6" fill="currentColor" />
+                                <path d="M4,4 L45,4 C30,12 22,22 22,45 C18,25 12,28 4,45 Z" fill="white"
+                                    opacity="0.4" />
+                            </g>
+
+                            <!-- Top Center Kbach Ornaments -->
+                            <g transform="translate(525, 30)">
+                                <path
+                                    d="M-40,0 C-20,15 -10,25 0,35 C10,25 20,15 40,0 C20,8 10,12 0,16 C-10,12 -20,8 -40,0 Z"
+                                    fill="currentColor" />
+                            </g>
+
+                            <!-- Bottom Center Kbach Ornaments -->
+                            <g transform="translate(525, 712) scale(1, -1)">
+                                <path
+                                    d="M-40,0 C-20,15 -10,25 0,35 C10,25 20,15 40,0 C20,8 10,12 0,16 C-10,12 -20,8 -40,0 Z"
+                                    fill="currentColor" />
+                            </g>
+
+                            <!-- Edge Repeating Khmer Vine Pattern Overlays -->
+                            <path
+                                d="M 120 18 Q 150 10 180 18 Q 210 26 240 18 Q 270 10 300 18 Q 330 26 360 18 Q 390 10 420 18 Q 450 26 480 18 M 570 18 Q 600 10 630 18 Q 660 26 690 18 Q 720 10 750 18 Q 780 26 810 18 Q 840 10 870 18 Q 900 26 930 18"
+                                stroke="currentColor" stroke-width="1.5" fill="none" />
+                            <path
+                                d="M 120 724 Q 150 716 180 724 Q 210 732 240 724 Q 270 716 300 724 Q 330 732 360 724 Q 390 716 420 724 Q 450 732 480 724 M 570 724 Q 600 716 630 724 Q 660 732 690 724 Q 720 716 750 724 Q 780 732 810 724 Q 840 716 870 724 Q 900 732 930 724"
+                                stroke="currentColor" stroke-width="1.5" fill="none" />
+                        </svg>
+                    </div>
+
+                    <!-- Inner Content Layout -->
+                    <div class="relative z-10 h-full p-10 flex flex-col justify-between text-slate-900 font-battambang">
+
+                        <!-- Top Header Section (Left: School/Ministry, Right: National Motto) -->
+                        <div class="grid grid-cols-12 items-start pt-2">
+
+                            <!-- Left Top: Emblem & Ministry / School Header -->
+                            <div id="cert-header-left"
+                                class="col-span-5 flex flex-col items-center text-center text-blue-900 header-text-theme draggable-element">
+                                <!-- MoEYS Emblem / School Logo -->
+                                <div class="w-16 h-16 mb-1 flex items-center justify-center">
+                                    <img id="cert-logo"
+                                        src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23153285' stroke='%23d97706' stroke-width='3'/><path d='M50 15 L58 35 L80 35 L62 48 L69 70 L50 56 L31 70 L38 48 L20 35 L42 35 Z' fill='%23fbbf24'/><circle cx='50' cy='50' r='12' fill='%23ffffff'/><path d='M50 42 L53 50 L60 50 L54 54 L56 62 L50 57 L44 62 L46 54 L40 50 L47 50 Z' fill='%23dc2626'/></svg>"
+                                        alt="Emblem" class="max-w-full max-h-full object-contain">
+                                </div>
+                                <div id="cert-ministry"
+                                    class="font-moul text-[15px] text-[#153285] leading-snug header-text-theme">
+                                    ក្រសួងអប់រំ យុវជន និងកីឡា</div>
+                                <div id="cert-office"
+                                    class="font-moul text-[13.5px] text-[#153285] leading-snug mt-0.5 header-text-theme">
+                                    ការិ.យអក នៃរដ្ឋបាលស្រុកជលគិរី</div>
+                                <div id="cert-school"
+                                    class="font-moul text-[13.5px] text-[#153285] leading-snug mt-0.5 header-text-theme">
+                                    វិទ្យាល័យ ព្រះនរោត្តម សីហមុនី</div>
+                            </div>
+
+                            <div class="col-span-2"></div>
+
+                            <!-- Right Top: Kingdom of Cambodia & Motto -->
+                            <div id="cert-header-right"
+                                class="col-span-5 flex flex-col items-center text-center text-blue-900 header-text-theme draggable-element">
+                                <div class="font-moul text-[15px] text-[#153285] leading-snug header-text-theme">
+                                    ព្រះរាជាណាចក្រកម្ពុជា</div>
+                                <div class="font-moul text-[14px] text-[#153285] leading-snug mt-1 header-text-theme">
+                                    ជាតិ សាសនា ព្រះមហាក្សត្រ</div>
+
+                                <!-- Khmer Decorative Ornament SVG Separator -->
+                                <div class="w-36 h-5 my-1 text-[#153285] border-svg-theme">
+                                    <svg viewBox="0 0 160 20" fill="currentColor" class="w-full h-full">
+                                        <path
+                                            d="M0,10 L50,10 C55,10 60,5 65,5 C70,5 72,15 80,10 C88,15 90,5 95,5 C100,5 105,10 110,10 L160,10 M75,10 C75,7 80,4 80,1 C80,4 85,7 85,10 C85,13 80,16 80,19 C80,16 75,13 75,10 Z" />
+                                        <circle cx="45" cy="10" r="2.5" />
+                                        <circle cx="115" cy="10" r="2.5" />
+                                    </svg>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Center Section: Certificate Title & Recipient Details -->
+                        <div class="text-center my-auto py-2 flex flex-col items-center justify-center">
+
+                            <!-- Main Certificate Title: បណ្ណសរសើរ -->
+                            <h2 id="cert-title"
+                                class="font-moul text-[44px] text-[#d9381e] tracking-wide leading-none mb-3 drop-shadow-sm draggable-element">
+                                បណ្ណសរសើរ
+                            </h2>
+
+                            <!-- Principal Title Accent -->
+                            <div id="cert-principal-title"
+                                class="font-moul text-[21px] text-[#d97706] mb-4 leading-relaxed draggable-element">
+                                នាយកវិទ្យាល័យ ព្រះនរោត្តម សីហមុនី
+                            </div>
+
+                            <!-- Main Body Text Paragraph -->
+                            <div id="cert-body-paragraph"
+                                class="text-[18.5px] text-slate-900 leading-[2.1] max-w-[920px] text-center px-4 font-battambang draggable-element">
+                                សូមសរសើរចំពោះសិស្សឈ្មោះ៖
+                                <span id="cert-student-name"
+                                    class="font-bold text-[#153285] px-1 font-moul text-[19px]">សស់ សៀងហេង</span>
+                                ភេទ
+                                <span id="cert-gender" class="font-bold text-[#153285] px-1">ប្រុស</span>
+                                កើតនៅថ្ងៃទី
+                                <span id="cert-dob-day" class="font-bold text-[#153285] px-1">២៤</span>
+                                ខែ
+                                <span id="cert-dob-month" class="font-bold text-[#153285] px-1">មេសា</span>
+                                ឆ្នាំ
+                                <span id="cert-dob-year" class="font-bold text-[#153285] px-1">២០១៤</span>
+                                រៀនថ្នាក់ទី
+                                <span id="cert-grade" class="font-bold text-[#153285] px-1">៧"C"</span><br>
+                                ដែលទទួលបានលទ្ធផលល្អក្នុងការសិក្សានិងទទួលបានចំណាត់ថ្នាក់លេខ
+                                <span id="cert-rank" class="font-bold text-[#d9381e] px-1 text-[21px]">៥</span>
+                                <span id="cert-period" class="font-bold text-[#d9381e] px-1">ប្រចាំខែឧសភា</span>
+                                ឆ្នាំសិក្សា
+                                <span id="cert-academic-year" class="font-bold text-slate-900 px-1">២០២៥-២០២៦</span>
+                                ។<br>
+                                <span class="text-[17.5px]">បណ្ណសរសើរនេះប្រគល់ជូនសាមីខ្លួនប្រើប្រាស់តាមការដែលអាចប្រើបាន
+                                    ។</span>
+                            </div>
+
+                        </div>
+
+                        <!-- Bottom Section: Lunar Date, Solar Date, Photo Box & Signatures -->
+                        <div class="grid grid-cols-12 items-end pt-4 pb-2 text-[14.5px]">
+
+                            <!-- Bottom Left Signature: Principal -->
+                            <div id="cert-sign-left"
+                                class="col-span-4 text-center flex flex-col items-center justify-end text-blue-900 header-text-theme draggable-element">
+                                <div id="cert-lunar-left" class="text-[12.5px] leading-tight text-slate-800 mb-0.5">
+                                    ថ្ងៃចន្ទ ៥កើត ខែជេស្ឋ ឆ្នាំថោះ បញ្ចស័ក ព.ស. ២៥៧០
+                                </div>
+                                <div id="cert-solar-left"
+                                    class="text-[13px] leading-tight text-slate-900 mb-2 font-medium">
+                                    វិ.ព្រះនរោត្តមសីហមុនី ថ្ងៃទី២៥ ខែឧសភា ឆ្នាំ២០២៦
+                                </div>
+                                <div class="font-moul text-[14px] text-[#153285] mb-1 header-text-theme">បានឃើញ និងឯកភាព
+                                </div>
+                                <div id="cert-principal-sign-label"
+                                    class="font-moul text-[15px] text-[#153285] min-h-[10px] flex items-end justify-center header-text-theme">
+                                    នាយកសាលា
+                                </div>
+                            </div>
+
+                            <!-- Bottom Center: Photo Box / Official Seal Box -->
+                            <div class="col-span-4 flex items-center justify-center">
+                                <div id="cert-photo-container"
+                                    class="w-24 h-32 border-2 border-slate-400 bg-slate-50/50 flex flex-col items-center justify-center relative shadow-inner overflow-hidden rounded-sm draggable-element">
+                                    <img id="cert-photo-img" src="" alt="Student Photo"
+                                        class="hidden w-full h-full object-cover">
+                                    <div id="cert-photo-placeholder"
+                                        class="text-center p-2 text-slate-400 text-[11px] leading-tight">
+                                        <i class="fa-regular fa-id-badge text-xl mb-1 text-slate-300 block"></i>
+                                        <span>រូបថត ៤x៦<br>ឬ ត្រាសាលា</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bottom Right Signature: Homeroom Teacher -->
+                            <div id="cert-sign-right"
+                                class="col-span-4 text-center flex flex-col items-center justify-end text-blue-900 header-text-theme draggable-element">
+                                <div id="cert-lunar-right" class="text-[12.5px] leading-tight text-slate-800 mb-0.5">
+                                    ថ្ងៃចន្ទ ៥កើត ខែជេស្ឋ ឆ្នាំថោះ បញ្ចស័ក ព.ស. ២៥៧០
+                                </div>
+                                <div id="cert-solar-right"
+                                    class="text-[13px] leading-tight text-slate-900 mb-2 font-medium">
+                                    វិ.ព្រះនរោត្តមសីហមុនី ថ្ងៃទី២៥ ខែឧសភា ឆ្នាំ២០២៦
+                                </div>
+                                <div class="font-moul text-[14px] text-[#153285] mb-1 header-text-theme">
+                                    គ្រូបន្ទុកថ្នាក់</div>
+                                <div id="cert-teacher-name"
+                                    class="font-moul text-[15px] text-[#153285] min-h-[65px] flex items-end justify-center header-text-theme">
+                                    វី ធីរ៉ូ
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Printable Container for Batch Multi-Page Certificate Printing -->
+    <div id="batch-print-container" class="hidden"></div>
+
+    <!-- Google Sheets Sync Modal Dialog -->
+    <div id="modal-google-sheets" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm hidden p-4">
+        <div class="bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <!-- Modal Header -->
+            <div class="px-5 py-4 bg-slate-800/80 border-b border-slate-700/60 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-600/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 font-bold">
+                        <i class="fa-solid fa-file-excel text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-white font-moul">រក្សាទុក និងសមកាលកម្មទិន្នន័យ (Google Sheets)</h3>
+                        <p class="text-[11px] text-slate-400">ចែករំលែក និងប្រើប្រាស់ទិន្នន័យរួមគ្នានៅលើគ្រប់ឧបករណ៍ទាំងអស់</p>
+                    </div>
+                </div>
+                <button id="btn-close-gsheet-modal" class="text-slate-400 hover:text-white text-lg p-1.5 rounded-lg hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-5 space-y-4 overflow-y-auto custom-scrollbar text-xs">
+                <!-- Status & Web App URL Input -->
+                <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/60 space-y-3">
+                    <label class="font-bold text-slate-200 text-xs flex items-center justify-between">
+                        <span><i class="fa-solid fa-link text-emerald-400 mr-1"></i> Google Apps Script Web App URL ឬ Public CSV URL</span>
+                        <span id="gsheet-connection-status" class="px-2 py-0.5 rounded text-[10px] font-normal bg-slate-700 text-slate-300">មិនទាន់បានភ្ជាប់</span>
+                    </label>
+                    <div class="flex gap-2">
+                        <input type="url" id="input-gsheet-url" placeholder="https://script.google.com/macros/s/.../exec"
+                            class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-emerald-500 outline-none">
+                        <button id="btn-save-gsheet-url" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition flex items-center gap-1.5 shrink-0">
+                            <i class="fa-solid fa-floppy-disk"></i> រក្សាទុក URL
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sync Action Buttons -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button id="btn-modal-gsheet-save" class="p-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-md">
+                        <i class="fa-solid fa-cloud-arrow-up text-base"></i>
+                        <span>📤 រក្សាទុកទៅ Google Sheet</span>
+                    </button>
+                    <button id="btn-modal-gsheet-load" class="p-3.5 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-md">
+                        <i class="fa-solid fa-cloud-arrow-down text-base"></i>
+                        <span>📥 ទាញយកពី Google Sheet</span>
+                    </button>
+                </div>
+
+                <!-- Copy Code Button -->
+                <div class="flex items-center justify-between bg-slate-950/60 p-3 rounded-xl border border-slate-800 gap-2">
+                    <div class="text-slate-300">
+                        <span class="font-bold text-amber-400"><i class="fa-solid fa-code"></i> កូដ Apps Script សម្រាប់ Google Sheet</span>
+                        <p class="text-[11px] text-slate-400">ចម្លងយកទៅដាក់ក្នុង Google Sheet របស់អ្នកដើម្បីបង្កើត Web App</p>
+                    </div>
+                    <button id="btn-copy-apps-script" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg transition flex items-center gap-1.5 shrink-0">
+                        <i class="fa-solid fa-copy"></i> ចម្លងកូដ
+                    </button>
+                </div>
+
+                <!-- Step-by-step Setup Guide -->
+                <div class="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50 space-y-2 text-[11.5px] leading-relaxed text-slate-300">
+                    <div class="font-bold text-amber-400 text-xs flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-info"></i> របៀបភ្ជាប់ Google Sheet (២នាទីប៉ុណ្ណោះ)៖
+                    </div>
+                    <ol class="list-decimal list-inside space-y-1 text-slate-300">
+                        <li>បើក **Google Sheets** ថ្មីមួយ (ឬប្រើ Sheet មានស្រាប់)។</li>
+                        <li>ចុច Menu **Extensions** ➡️ **Apps Script**។</li>
+                        <li>លុបកូដចាស់ចោល រួចចុចប៊ូតុង **"ចម្លងកូដ"** ខាងលើមក Paste ចូល។</li>
+                        <li>ចុច **Deploy** (ខាងលើស្តាំ) ➡️ **New deployment** ➡️ ជ្រើស **Web app**។</li>
+                        <li>ត្រង់កន្លែង **Who has access** ត្រូវជ្រើស **"Anyone"** (សំខាន់បំផុត!) ➡️ រួចចុច **Deploy**។</li>
+                        <li>ចម្លងយក **Web App URL** ដែលទទួលបាន មក Paste ក្នុងប្រអប់ខាងលើនេះ រួចចុច **"រក្សាទុក"** ជាការស្រេច!</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-5 py-3 bg-slate-800/80 border-t border-slate-700/60 text-right">
+                <button id="btn-close-gsheet-modal-2" class="px-4 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg text-xs font-medium transition">
+                    បិទ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script src="app.js"></script>
+</body>
+
+</html>

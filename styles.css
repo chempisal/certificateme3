@@ -1,0 +1,200 @@
+/* Custom CSS for Khmer Certificate of Commendation Generator */
+@import url('https://fonts.googleapis.com/css2?family=Battambang:wght@400;700&family=Kantumruy+Pro:wght@400;500;600;700&family=Moul&family=Moulpali&family=Siemreap&family=Inter:wght@400;500;600;700&display=swap');
+
+/* Font Families */
+.font-moul {
+    font-family: 'Moul', 'Moulpali', 'Khmer OS Muol Light', cursive, serif;
+}
+
+.font-battambang {
+    font-family: 'Battambang', 'Khmer OS Battambang', serif;
+}
+
+.font-kantumruy {
+    font-family: 'Kantumruy Pro', 'Kantumruy', sans-serif;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.6);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(51, 65, 85, 0.8);
+    border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(71, 85, 105, 1);
+}
+
+/* UI Form Inputs */
+.form-input {
+    width: 100%;
+    background-color: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(51, 65, 85, 0.8);
+    border-radius: 0.5rem;
+    padding: 0.4rem 0.65rem;
+    font-size: 0.75rem;
+    color: #f1f5f9;
+    outline: none;
+    transition: all 0.15s ease-in-out;
+}
+
+.form-input:focus {
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+    background-color: rgba(15, 23, 42, 0.9);
+}
+
+/* Draggable Canvas Elements */
+.draggable-element {
+    cursor: grab;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+    border: 1.5px dashed transparent;
+    border-radius: 4px;
+    user-select: none;
+    position: relative;
+    z-index: 10;
+}
+
+.draggable-element:hover {
+    border-color: rgba(245, 158, 11, 0.7);
+    background-color: rgba(254, 243, 199, 0.15);
+}
+
+.draggable-element.is-dragging {
+    cursor: grabbing !important;
+    border-color: rgba(245, 158, 11, 1) !important;
+    background-color: rgba(254, 243, 199, 0.3) !important;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    z-index: 50 !important;
+}
+
+/* Tab Button Styling */
+.tab-btn.active {
+    background-color: #1e293b;
+    color: #fbbf24;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* CERTIFICATE CANVAS SPECIFICATIONS */
+/* Standard A4 Landscape Aspect Ratio (297mm x 210mm ~ 1050px x 742px) */
+#certificate-canvas {
+    width: 1050px;
+    height: 742px;
+    min-width: 1050px;
+    min-height: 742px;
+    max-width: 1050px;
+    max-height: 742px;
+    background-color: #ffffff;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    border-radius: 2px;
+    box-sizing: border-box;
+    transform-origin: center top;
+}
+
+/* Theme Color Dynamics */
+.border-svg-theme {
+    color: #153285; /* Default Royal Blue */
+    transition: color 0.3s ease;
+}
+
+.header-text-theme {
+    color: #153285;
+    transition: color 0.3s ease;
+}
+
+/* Printing Media Query - High Precision A4 Landscape */
+@media print {
+    @page {
+        size: A4 landscape;
+        margin: 0;
+    }
+
+    body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        min-height: auto !important;
+        overflow: visible !important;
+    }
+
+    /* Lock Date Positions & Prevent Shifting During Print */
+    #cert-lunar-left, #cert-solar-left, #cert-lunar-right, #cert-solar-right,
+    .date-fixed-print {
+        transform: none !important;
+        line-height: 1.25 !important;
+    }
+
+    /* Hide Web App Interface */
+    .no-print, header, aside, .app-container > aside, button, .zoom-controls {
+        display: none !important;
+    }
+
+    /* Single vs Batch Print Toggles */
+    body.printing-batch #certificate-wrapper {
+        display: none !important;
+    }
+    body.printing-batch #batch-print-container {
+        display: block !important;
+        visibility: visible !important;
+    }
+
+    .batch-print-page {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: 100vw !important;
+        max-height: 100vh !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        page-break-inside: avoid !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        position: relative !important;
+        background-color: #ffffff !important;
+    }
+
+    .app-container {
+        display: block !important;
+        overflow: visible !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    main {
+        padding: 0 !important;
+        background-color: transparent !important;
+        overflow: visible !important;
+        display: block !important;
+    }
+
+    #certificate-wrapper {
+        transform: scale(1) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    #certificate-canvas {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: 100vw !important;
+        max-height: 100vh !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        page-break-after: always;
+        page-break-inside: avoid;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}
